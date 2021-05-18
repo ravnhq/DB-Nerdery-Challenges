@@ -68,7 +68,7 @@ CREATE TABLE public.employees (
     email character varying,
     job_title character varying,
     created_at timestamp(3) without time zone,
-    reports_to integer,
+    supervisor_id integer,
     office_id integer
 );
 
@@ -216,7 +216,7 @@ COPY public.countries (id, uuid, name, iso_name) FROM stdin;
 -- Data for Name: employees; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.employees (id, uuid, first_name, last_name, email, job_title, created_at, reports_to, office_id) FROM stdin;
+COPY public.employees (id, uuid, first_name, last_name, email, job_title, created_at, supervisor_id, office_id) FROM stdin;
 1	b0de594d-7c8b-4818-9335-61c91733cae9	Alma	Trantow	Alma.Trantow83@hotmail.com	Corporate Optimization Facilitator	2013-10-29 16:30:24.654	\N	163
 2	b050641c-6b7b-4792-a51c-2ff729562767	Melinda	Morissette	Melinda.Morissette18@gmail.com	Legacy Program Orchestrator	2011-08-12 09:49:32.588	1	160
 3	4b4c4ebc-fe4a-4778-b13c-a0bd8acd495a	Angelica	Dietrich	Angelica_Dietrich37@yahoo.com	Investor Functionality Assistant	2011-11-27 21:45:15.008	2	146
@@ -1641,11 +1641,11 @@ ALTER TABLE ONLY public.employees
 
 
 --
--- Name: employees employees_reports_to_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: employees employees_supervisor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.employees
-    ADD CONSTRAINT employees_reports_to_fkey FOREIGN KEY (reports_to) REFERENCES public.employees(id);
+    ADD CONSTRAINT employees_supervisor_id_fkey FOREIGN KEY (supervisor_id) REFERENCES public.employees(id);
 
 
 --

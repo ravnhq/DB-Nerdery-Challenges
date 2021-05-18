@@ -16,11 +16,11 @@
 
 ## 🤓 About <a name = "about"></a>
 
-The database provided corresponds to a company in which it has different headquarters in various places around the world, in turn, each headquarters has a group of employees of which it is hierarchically organized and each employee may have a boss. That said we have the following Entity Relationship Diagram (ERD)
+The database provided corresponds to a company in which it has different headquarters in various places around the world, in turn, each headquarters has a group of employees of which it is hierarchically organized and each employee may have a supervisor. That said we have the following Entity Relationship Diagram (ERD)
 
 #### ERD - Diagram <br>
 
-![Comparison](CompanySQL/ERD.png) <br>
+![Comparison](src/ERD.png) <br>
 
 ---
 
@@ -60,10 +60,10 @@ create database nerdery_challenge;
 4. Restore de postgres backup file
 
 ```
-cat /home/user/.../CompanySQL/dump.sql | docker exec -i nerdery-container psql -U postgres -d nerdery_challenge
+cat /.../src/dump.sql | docker exec -i nerdery-container psql -U postgres -d nerdery_challenge
 ```
 
-- Note: The `...` mean the location where the CompanySQL folder is located on your computer
+- Note: The `...` mean the location where the src folder is located on your computer
 - Your data is now on your database to use for the challenge
 
 ---
@@ -80,9 +80,9 @@ Your query here
 
 - result:
   <br>
-  ![Comparison](CompanySQL/results/result1.png) <br>
+  ![Comparison](src/results/result1.png) <br>
 
-2. How many employees do not have bosses.
+2. How many employees do not have supervisores.
 
 ```
 Your query here
@@ -90,7 +90,7 @@ Your query here
 
 - result:
   <br>
-  ![Comparison](CompanySQL/results/result2.png) <br>
+  ![Comparison](src/results/result2.png) <br>
 
 3. List the top 5 offices address with the most employees and your country
 
@@ -100,9 +100,9 @@ Your query here
 
 - result:
   <br>
-  ![Comparison](CompanySQL/results/result3.png) <br>
+  ![Comparison](src/results/result3.png) <br>
 
-4. Three bosses with the most employees who are in charge.
+4. Three supervisores with the most employees who are in charge.
 
 ```
 Your query here
@@ -116,7 +116,7 @@ Your query here
 
 - result:
   <br>
-  ![Comparison](CompanySQL/results/result5.png) <br>
+  ![Comparison](src/results/result5.png) <br>
 
 6. The average number of employees per office.
 
@@ -132,4 +132,4 @@ Your query here
 
 - result:
   <br>
-  ![Comparison](CompanySQL/results/result7.png) <br>
+  ![Comparison](src/results/result7.png) <br>
