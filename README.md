@@ -123,3 +123,9 @@ Your query here
 ```
 
 ![Comparison](src/results/result7.png)
+
+8. Show the uuid of the employee, first_name and lastname combined, email, job_title, the name of the office they belong to, the name of the country, the name of the state and the name of the boss (boss_name)
+
+```
+Your query here
+```
