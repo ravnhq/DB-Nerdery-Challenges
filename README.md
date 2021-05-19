@@ -78,9 +78,7 @@ Said the above, the following results are desired:
 Your query here
 ```
 
-- result:
-  <br>
-  ![Comparison](src/results/result1.png) <br>
+![Comparison](src/results/result1.png)
 
 2. How many employees do not have supervisores.
 
@@ -88,9 +86,7 @@ Your query here
 Your query here
 ```
 
-- result:
-  <br>
-  ![Comparison](src/results/result2.png) <br>
+![Comparison](src/results/result2.png)
 
 3. List the top 5 offices address with the most employees and your country
 
@@ -98,9 +94,7 @@ Your query here
 Your query here
 ```
 
-- result:
-  <br>
-  ![Comparison](src/results/result3.png) <br>
+![Comparison](src/results/result3.png)
 
 4. Three supervisores with the most employees who are in charge.
 
@@ -114,9 +108,7 @@ Your query here
 Your query here
 ```
 
-- result:
-  <br>
-  ![Comparison](src/results/result5.png) <br>
+![Comparison](src/results/result5.png)
 
 6. The average number of employees per office.
 
@@ -130,6 +122,4 @@ Your query here
 Your query here
 ```
 
-- result:
-  <br>
-  ![Comparison](src/results/result7.png) <br>
+![Comparison](src/results/result7.png)
