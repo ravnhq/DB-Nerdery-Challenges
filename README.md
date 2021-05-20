@@ -6,6 +6,7 @@
  <a href="https://www.postgresql.org/" rel="noopener">
  <img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="Postgres logo" width="150px"></a>
 </p>
+
 ---
 
 <p align="center">A project to show off your skills on databases & SQL using a real database</p>
