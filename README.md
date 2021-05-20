@@ -1,8 +1,11 @@
 <p align="center">
  <a href="https://www.ravn.co/" rel="noopener">
- <img src="https://www.ravn.co/img/logo-ravn.png" alt="Project logo"></a>
+ <img src="https://www.ravn.co/img/logo-ravn.png" alt="RAVN logo" style="background-color:white"></a>
 </p>
-
+<p align="center">
+ <a href="https://www.postgresql.org/" rel="noopener">
+ <img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="Postgres logo" width="150px"></a>
+</p>
 ---
 
 <p align="center">A project to show off your skills on databases & SQL using a real database</p>
