@@ -5,18 +5,18 @@
 
 ---
 
-<p align="center">A project to show your skills on databases using a real database</p>
+<p align="center">A project to show off your skills on databases & SQL using a real database</p>
 
 ## 📝 Table of Contents
 
-- [About](#about)
+- [Case](#case)
 - [Installation](#installation)
 - [Data Recovery](#data_recovery)
-- [Chores](#chores)
+- [Excersises](#excersises)
 
-## 🤓 About <a name = "about"></a>
+## 🤓 Case <a name = "case"></a>
 
-The database provided corresponds to a company in which it has different headquarters in various places around the world, in turn, each headquarters has a group of employees of which it is hierarchically organized and each employee may have a supervisor. That said we have the following Entity Relationship Diagram (ERD)
+As a developer and expert on SQL, you were contacted by a company that needs your help to manage their database which runs on PostgreSQL. The database provided contains four entities: Employee, Office, Countries and States. The company has different headquarters in various places around the world, in turn, each headquarters has a group of employees of which it is hierarchically organized and each employee may have a supervisor. You are also provided with the following Entity Relationship Diagram (ERD)
 
 #### ERD - Diagram <br>
 
@@ -24,18 +24,13 @@ The database provided corresponds to a company in which it has different headqua
 
 ---
 
-## 🛠️ Installation <a name = "installation"></a>
+## 🛠️ Docker Installation <a name = "installation"></a>
 
-You have two ways to install PostgreSQL:
-
-1. Download the PostgreSQL server [here.](https://www.postgresql.org/download/)
-2. Install [docker](https://docs.docker.com/engine/install/) and the [PostgreSQL container.](https://hub.docker.com/_/postgres)
-
-Whatever method you choose, then you will have to perform the data restoration and continue with the activities
+1. Install [docker](https://docs.docker.com/engine/install/)
 
 ---
 
-## 📚 Data Recovery <a name = "data_recovery"></a>
+## 📚 Recover the data to your machine <a name = "data_recovery"></a>
 
 Open your terminal and run the follows commands:
 
@@ -68,9 +63,9 @@ cat /.../src/dump.sql | docker exec -i nerdery-container psql -U postgres -d ner
 
 ---
 
-## 📊 Chores <a name = "chores"></a>
+## 📊 Excersises <a name = "excersises"></a>
 
-Said the above, the following results are desired:
+Now it's your turn to write SQL querys to achieve the following results:
 
 1. Count the total number of states in each country.
 
@@ -78,7 +73,9 @@ Said the above, the following results are desired:
 Your query here
 ```
 
-![Comparison](src/results/result1.png)
+<p align="center">
+ <img src="src/results/result1.png" alt="result_1"/>
+</p>
 
 2. How many employees do not have supervisores.
 
@@ -86,35 +83,49 @@ Your query here
 Your query here
 ```
 
-![Comparison](src/results/result2.png)
+<p align="center">
+ <img src="src/results/result2.png" alt="result_2"/>
+</p>
 
-3. List the top 5 offices address with the most employees and your country
-
-```
-Your query here
-```
-
-![Comparison](src/results/result3.png)
-
-4. Three supervisores with the most employees who are in charge.
+3. List the top five offices address with the most amount of employees, order the result by country and display a column with a counter.
 
 ```
 Your query here
 ```
 
-5. How many offices are in the United States and in the state of Colorado.
+<p align="center">
+ <img src="src/results/result3.png" alt="result_3"/>
+</p>
+
+4. Three supervisors with the most amount of employees they are in charge.
 
 ```
 Your query here
 ```
 
-![Comparison](src/results/result5.png)
+<p align="center">
+ <img src="src/results/result4.png" alt="result_4"/>
+</p>
 
-6. The average number of employees per office.
+5. How many offices are in the state of Colorado (United States).
 
 ```
 Your query here
 ```
+
+<p align="center">
+ <img src="src/results/result5.png" alt="result_5"/>
+</p>
+
+6. The name of the office with its number of employees ordered in a desc.
+
+```
+Your query here
+```
+
+<p align="center">
+ <img src="src/results/result6.png" alt="result_6"/>
+</p>
 
 7. The office with more and less employees.
 
@@ -122,10 +133,16 @@ Your query here
 Your query here
 ```
 
-![Comparison](src/results/result7.png)
+<p align="center">
+ <img src="src/results/result7.png" alt="result_7"/>
+</p>
 
 8. Show the uuid of the employee, first_name and lastname combined, email, job_title, the name of the office they belong to, the name of the country, the name of the state and the name of the boss (boss_name)
 
 ```
 Your query here
 ```
+
+<p align="center">
+ <img src="src/results/result8.png" alt="result_8"/>
+</p>
