@@ -1,6 +1,6 @@
-<p align="center">
+<p align="center" style="background-color:white">
  <a href="https://www.ravn.co/" rel="noopener">
- <img src="https://www.ravn.co/img/logo-ravn.png" alt="RAVN logo" style="background-color:white"></a>
+ <img src="https://www.ravn.co/img/logo-ravn.png" alt="RAVN logo"></a>
 </p>
 <p align="center">
  <a href="https://www.postgresql.org/" rel="noopener">
