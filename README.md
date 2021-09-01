@@ -114,7 +114,7 @@ select supervisor_id,count(supervisor_id) from employees group by supervisor_id 
 5. How many offices are in the state of Colorado (United States).
 
 ```
-Your query here
+select count(*) as list_of_office from states s inner join offices o on s.id = o.state_id where s.name = 'Colorado';
 ```
 
 <p align="center">
