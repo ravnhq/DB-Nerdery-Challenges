@@ -94,7 +94,7 @@ select count(*) as employees_without_bosses from employees where supervisor_id i
 3. List the top five offices address with the most amount of employees, order the result by country and display a column with a counter.
 
 ```
-Your query here
+select c.name, t.address, t.count from (select o.country_id,address, count(o.id) from offices o inner join employees e on o.id = e.office_id group by o.id) t inner join countries c on t.country_id = c.id order by t.count desc, c.name;
 ```
 
 <p align="center">
