@@ -74,7 +74,7 @@ Now it's your turn to write SQL querys to achieve the following results:
 1. Count the total number of states in each country.
 
 ```
-SELECT c.name,count(s.name) FROM countries c RIGHT JOIN states s ON c.id = s.country_id GROUP BY c.name;
+select c.name,count(s.name) from countries c right join states s ON c.id = s.country_id group by c.name;
 ```
 
 <p align="center">
@@ -84,7 +84,7 @@ SELECT c.name,count(s.name) FROM countries c RIGHT JOIN states s ON c.id = s.cou
 2. How many employees do not have supervisores.
 
 ```
-Your query here
+select count(*) from employees where supervisor_id is null;
 ```
 
 <p align="center">
