@@ -1364,7 +1364,6 @@ COPY public.offices (id, uuid, phone, name, address, created_at, country_id, sta
 136	4a8d28ca-e78b-409b-aeec-3942dc6d9c7a	650-691-3887	Hettinger Inc	175 Wiegand Tunnel	2020-11-16 10:58:24.505	1	104
 137	ef749a1c-7c09-49f6-a518-eaa5c3122d28	243-864-5406 x73083	Greenfelder, Dare and Rohan	5882 Christiansen Roads	2020-10-16 08:28:03.224	2	82
 138	a047c01d-f52f-4de9-9e4d-fef5cae6df51	1-881-460-6683 x28632	Emard - Gulgowski	52816 Jennifer Square	2012-02-13 19:50:50.857	2	94
-139	2e71fb50-2ec8-40f0-a56d-81738bbc734d	1-626-972-8999	Russel, Schowalter and Yost	172 Ansley Motorway	2005-10-09 04:30:24.287	3	8
 140	157784e3-a2b2-4def-96f8-6c635424a16e	264.463.8669 x954	Lang - Sanford	7683 Monica Extensions	2008-12-25 18:50:18.804	3	48
 141	cebc5566-04f5-48a5-b252-e65fde0a1d61	1-929-745-3995	Schuppe - Nikolaus	05429 Wava Loop	2013-09-05 17:50:50.947	1	22
 142	8ef380d4-0925-4d6a-98f0-dc1677f1a6a8	1-842-217-9982 x315	Gutkowski, Bashirian and Erdman	081 Camylle Points	2011-07-27 09:44:11.397	1	61
@@ -1417,7 +1416,6 @@ COPY public.offices (id, uuid, phone, name, address, created_at, country_id, sta
 189	bec1843b-3ef2-43e2-a8d8-231a79ae40dd	930.299.4440	Lueilwitz, Davis and Christiansen	5467 Shanon Lakes	2007-03-02 19:27:37.86	2	7
 190	c6e8a007-dff1-41b2-9691-f0e425eac9ec	(995) 957-3999	Nienow - Jacobi	305 Mann Meadows	2004-11-30 03:42:04.303	1	88
 191	72ce602e-a0c9-41c6-ab78-531bf96f560f	(479) 519-4603 x57910	Kautzer, Deckow and Block	796 Elyse Throughway	2008-09-15 17:11:28.492	1	76
-192	36a75676-6b7d-4341-83a2-faf0698b4ec8	393-382-8282	Stroman - Auer	37772 Ramon Port	2019-03-13 10:12:56.324	3	8
 193	d29c694a-0c90-4ca2-bbbb-8c35d1904d9f	1-809-705-6920	Blick LLC	548 Hintz Locks	2020-10-03 20:28:53.882	3	96
 194	17dbb266-de39-403d-a31e-0c62028d08ce	(289) 744-2488 x80196	Torp Group	1749 Donna Causeway	2020-01-21 19:18:21.589	1	15
 195	89cc30d3-faca-4a5f-89d2-7694cde42340	273-966-6389	Deckow and Sons	4561 Jalen Island	2016-09-13 11:00:55.409	1	42
@@ -1426,6 +1424,8 @@ COPY public.offices (id, uuid, phone, name, address, created_at, country_id, sta
 198	2c62f035-e3ab-4364-8b92-23332c2e2fdd	588.699.9049 x32269	Terry - Robel	62292 Rhoda Knolls	2008-12-21 17:21:21.639	3	10
 199	4d6284eb-3d3f-4162-8d7f-9d5f50261f5b	1-663-751-3086 x415	Schuppe, Lakin and Bechtelar	6712 Cruickshank Plaza	2015-05-05 16:51:37.712	3	47
 200	e436d1ef-2392-4e52-82b6-2ee93d2d7397	304.619.5838 x14612	Koepp LLC	9343 Simone Tunnel	2000-12-22 20:32:01.781	3	89
+139	2e71fb50-2ec8-40f0-a56d-81738bbc734d	1-626-972-8999	Russel, Schowalter and Yost	172 Ansley Motorway	2005-10-09 04:30:24.287	1	8
+192	36a75676-6b7d-4341-83a2-faf0698b4ec8	393-382-8282	Stroman - Auer	37772 Ramon Port	2019-03-13 10:12:56.324	1	8
 \.
 
 
