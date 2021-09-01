@@ -134,7 +134,12 @@ select o.name, count(o.id) from offices o inner join employees e on o.id = e.off
 7. The office with more and less employees.
 
 ```
-Your query here
+select * from
+(
+    (select o.address, count(o.id) from offices o inner join employees e on o.id = e.office_id group by o.id order by count limit 1)
+    union all
+    (select o.address, count(o.id) from offices o inner join employees e on o.id = e.office_id group by o.id order by count desc limit 1)
+) t;
 ```
 
 <p align="center">
