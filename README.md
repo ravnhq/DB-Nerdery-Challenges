@@ -104,7 +104,7 @@ select c.name, t.address, t.count from (select o.country_id,address, count(o.id)
 4. Three supervisors with the most amount of employees they are in charge.
 
 ```
-select supervisor_id,count(supervisor_id) from employees group by supervisor_id order by count desc limit 3;
+select supervisor_id, count(supervisor_id) from employees group by supervisor_id order by count desc limit 3;
 ```
 
 <p align="center">
@@ -151,8 +151,9 @@ select * from
 ```
 select e.uuid, CONCAT(e.first_name,' ', e.last_name) as full_name, e.email,
 e.job_title, o.name as company, c.name as country, s.name as state,
-e2.first_name as boss_name from employees e
-inner join offices o on e.office_id = o.id
+e2.first_name as boss_name
+from employees e
+    inner join offices o on e.office_id = o.id
     inner join countries c on o.country_id = c.id
     inner join states s on o.state_id = s.id
     inner join employees e2 on e.supervisor_id = e2.id;
