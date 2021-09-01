@@ -74,7 +74,14 @@ Now it's your turn to write SQL querys to achieve the following results:
 1. Count the total number of states in each country.
 
 ```
-select c.name,count(s.name) from countries c right join states s ON c.id = s.country_id group by c.name;
+SELECT
+    c.name,
+    count(s.name)
+FROM
+    countries c
+    RIGHT JOIN states s ON c.id = s.country_id
+GROUP BY
+    c.name;
 ```
 
 <p align="center">
@@ -84,7 +91,12 @@ select c.name,count(s.name) from countries c right join states s ON c.id = s.cou
 2. How many employees do not have supervisores.
 
 ```
-select count(*) as employees_without_bosses from employees where supervisor_id is null;
+SELECT
+    count(*) AS employees_without_bosses
+FROM
+    employees
+WHERE
+    supervisor_id IS NULL;
 ```
 
 <p align="center">
@@ -94,7 +106,26 @@ select count(*) as employees_without_bosses from employees where supervisor_id i
 3. List the top five offices address with the most amount of employees, order the result by country and display a column with a counter.
 
 ```
-select c.name, t.address, t.count from (select o.country_id,address, count(o.id) from offices o inner join employees e on o.id = e.office_id group by o.id) t inner join countries c on t.country_id = c.id order by t.count desc, c.name;
+SELECT
+    c.name,
+    t.address,
+    t.count
+FROM
+    (
+        SELECT
+            o.country_id,
+            address,
+            count(o.id)
+        FROM
+            offices o
+            INNER JOIN employees e ON o.id = e.office_id
+        GROUP BY
+            o.id
+    ) t
+    INNER JOIN countries c ON t.country_id = c.id
+ORDER BY
+    t.count DESC,
+    c.name;
 ```
 
 <p align="center">
@@ -104,7 +135,17 @@ select c.name, t.address, t.count from (select o.country_id,address, count(o.id)
 4. Three supervisors with the most amount of employees they are in charge.
 
 ```
-select supervisor_id, count(supervisor_id) from employees group by supervisor_id order by count desc limit 3;
+SELECT
+    supervisor_id,
+    count(supervisor_id)
+FROM
+    employees
+GROUP BY
+    supervisor_id
+ORDER BY
+    count DESC
+LIMIT
+    3;
 ```
 
 <p align="center">
@@ -114,7 +155,13 @@ select supervisor_id, count(supervisor_id) from employees group by supervisor_id
 5. How many offices are in the state of Colorado (United States).
 
 ```
-select count(*) as list_of_office from states s inner join offices o on s.id = o.state_id where s.name = 'Colorado';
+SELECT
+    count(*) AS list_of_office
+FROM
+    states s
+    INNER JOIN offices o ON s.id = o.state_id
+WHERE
+    s.name = 'Colorado';
 ```
 
 <p align="center">
@@ -134,12 +181,40 @@ select o.name, count(o.id) from offices o inner join employees e on o.id = e.off
 7. The office with more and less employees.
 
 ```
-select * from
-(
-    (select o.address, count(o.id) from offices o inner join employees e on o.id = e.office_id group by o.id order by count limit 1)
-    union all
-    (select o.address, count(o.id) from offices o inner join employees e on o.id = e.office_id group by o.id order by count desc limit 1)
-) t;
+SELECT
+    *
+FROM
+    (
+        (
+            SELECT
+                o.address,
+                count(o.id)
+            FROM
+                offices o
+                INNER JOIN employees e ON o.id = e.office_id
+            GROUP BY
+                o.id
+            ORDER BY
+                count
+            LIMIT
+                1
+        )
+        UNION
+        ALL (
+            SELECT
+                o.address,
+                count(o.id)
+            FROM
+                offices o
+                INNER JOIN employees e ON o.id = e.office_id
+            GROUP BY
+                o.id
+            ORDER BY
+                count DESC
+            LIMIT
+                1
+        )
+    ) t;
 ```
 
 <p align="center">
@@ -149,14 +224,21 @@ select * from
 8. Show the uuid of the employee, first_name and lastname combined, email, job_title, the name of the office they belong to, the name of the country, the name of the state and the name of the boss (boss_name)
 
 ```
-select e.uuid, CONCAT(e.first_name,' ', e.last_name) as full_name, e.email,
-e.job_title, o.name as company, c.name as country, s.name as state,
-e2.first_name as boss_name
-from employees e
-    inner join offices o on e.office_id = o.id
-    inner join countries c on o.country_id = c.id
-    inner join states s on o.state_id = s.id
-    inner join employees e2 on e.supervisor_id = e2.id;
+SELECT
+    e.uuid,
+    CONCAT(e.first_name, ' ', e.last_name) AS full_name,
+    e.email,
+    e.job_title,
+    o.name AS company,
+    c.name AS country,
+    s.name AS state,
+    e2.first_name AS boss_name
+FROM
+    employees e
+    INNER JOIN offices o ON e.office_id = o.id
+    INNER JOIN countries c ON o.country_id = c.id
+    INNER JOIN states s ON o.state_id = s.id
+    INNER JOIN employees e2 ON e.supervisor_id = e2.id;
 ```
 
 <p align="center">
