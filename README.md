@@ -124,7 +124,7 @@ select count(*) as list_of_office from states s inner join offices o on s.id = o
 6. The name of the office with its number of employees ordered in a desc.
 
 ```
-Your query here
+select o.name, count(o.id) from offices o inner join employees e on o.id = e.office_id group by o.id order by count desc;
 ```
 
 <p align="center">
