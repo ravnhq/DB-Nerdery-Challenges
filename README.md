@@ -84,7 +84,7 @@ select c.name,count(s.name) from countries c right join states s ON c.id = s.cou
 2. How many employees do not have supervisores.
 
 ```
-select count(*) from employees where supervisor_id is null;
+select count(*) as employees_without_bosses from employees where supervisor_id is null;
 ```
 
 <p align="center">
