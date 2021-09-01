@@ -149,7 +149,13 @@ select * from
 8. Show the uuid of the employee, first_name and lastname combined, email, job_title, the name of the office they belong to, the name of the country, the name of the state and the name of the boss (boss_name)
 
 ```
-Your query here
+select e.uuid, CONCAT(e.first_name,' ', e.last_name) as full_name, e.email,
+e.job_title, o.name as company, c.name as country, s.name as state,
+e2.first_name as boss_name from employees e
+inner join offices o on e.office_id = o.id
+    inner join countries c on o.country_id = c.id
+    inner join states s on o.state_id = s.id
+    inner join employees e2 on e.supervisor_id = e2.id;
 ```
 
 <p align="center">
