@@ -102,7 +102,7 @@ UNION
   ORDER BY 
     count DESC
   LIMIT 1
-) ORDER BY 1;
+) ORDER BY 2;
 -- 8
 SELECT
   e.uuid, CONCAT(e.first_name, ' ', e.last_name) AS full_name, e.email, e.job_title, o.name AS company, c.name AS country, s.name AS state, m.first_name AS boss_name
