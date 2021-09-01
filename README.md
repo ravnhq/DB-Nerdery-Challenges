@@ -104,7 +104,7 @@ select c.name, t.address, t.count from (select o.country_id,address, count(o.id)
 4. Three supervisors with the most amount of employees they are in charge.
 
 ```
-Your query here
+select supervisor_id,count(supervisor_id) from employees group by supervisor_id order by count desc limit 3;
 ```
 
 <p align="center">
