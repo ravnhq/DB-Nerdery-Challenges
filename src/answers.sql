@@ -56,8 +56,12 @@ INNER JOIN
   states s
 ON
   o.state_id = s.id
+INNER JOIN
+  countries c
+ON 
+  s.country_id = c.id
 WHERE
-  s.name = 'Colorado';
+  s.name = 'Colorado' AND c.name = 'United States';
 -- 6
 SELECT
   o.name, COUNT(*) AS count
