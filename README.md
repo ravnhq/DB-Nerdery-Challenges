@@ -171,7 +171,16 @@ WHERE
 6. The name of the office with its number of employees ordered in a desc.
 
 ```
-select o.name, count(o.id) from offices o inner join employees e on o.id = e.office_id group by o.id order by count desc;
+SELECT
+    o.name,
+    count(o.id)
+FROM
+    offices o
+    INNER JOIN employees e ON o.id = e.office_id
+GROUP BY
+    o.id
+ORDER BY
+    count DESC;
 ```
 
 <p align="center">
