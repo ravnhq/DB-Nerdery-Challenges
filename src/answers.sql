@@ -36,8 +36,9 @@ FROM
     ) t
     INNER JOIN countries c ON t.country_id = c.id
 ORDER BY
-    t.count DESC,
-    c.name;
+    t.count DESC
+LIMIT
+    5;
 
 -- 4
 SELECT
@@ -74,40 +75,37 @@ ORDER BY
     count DESC;
 
 -- 7
-SELECT
-    *
-FROM
-    (
-        (
-            SELECT
-                o.address,
-                count(o.id)
-            FROM
-                offices o
-                INNER JOIN employees e ON o.id = e.office_id
-            GROUP BY
-                o.id
-            ORDER BY
-                count
-            LIMIT
-                1
-        )
-        UNION
-        ALL (
-            SELECT
-                o.address,
-                count(o.id)
-            FROM
-                offices o
-                INNER JOIN employees e ON o.id = e.office_id
-            GROUP BY
-                o.id
-            ORDER BY
-                count DESC
-            LIMIT
-                1
-        )
-    ) t;
+(
+    SELECT
+        o.address,
+        count(o.id)
+    FROM
+        offices o
+        INNER JOIN employees e ON o.id = e.office_id
+    GROUP BY
+        o.id
+    ORDER BY
+        count
+    LIMIT
+        1
+)
+UNION
+ALL (
+    SELECT
+        o.address,
+        count(o.id)
+    FROM
+        offices o
+        INNER JOIN employees e ON o.id = e.office_id
+    GROUP BY
+        o.id
+    ORDER BY
+        count DESC
+    LIMIT
+        1
+)
+ORDER BY
+    count DESC;
 
 -- 8
 SELECT
