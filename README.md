@@ -75,10 +75,10 @@ Now it's your turn to write SQL querys to achieve the following results:
 
 ```
 
-select countries.name, count(countries.name) 
-from countries 
-inner join states on countries.id = states.country_id 
-group by countries.name;
+SELECT countries.name, COUNT(countries.name) 
+FROM countries 
+INNER JOIN states ON countries.id = states.country_id 
+GROUP BY countries.name;
 
 ```
 
@@ -90,9 +90,9 @@ group by countries.name;
 
 ```
 
-select count(*) as employees_without_bosses 
-from employees 
-where supervisor_id is null;
+SELECT COUNT(*) AS employees_without_bosses 
+FROM employees 
+WHERE supervisor_id IS NULL;
 
 ```
 
@@ -104,11 +104,11 @@ where supervisor_id is null;
 
 ```
 
-select countries.name, offices.address, count(employees.id) 
-from offices inner join employees on offices.id = employees.office_id 
-inner join countries on countries.id = offices.country_id 
-group by countries.name, offices.address  
-order by  count(employees.id) desc limit 5;
+SELECT countries.name, offices.address, COUNT(employees.id) 
+FROM offices INNER JOIN employees ON offices.id = employees.office_id 
+INNER JOIN countries ON countries.id = offices.country_id 
+GROUP BY countries.name, offices.address  
+ORDER BY  COUNT(employees.id) DESC LIMIT 5;
 
 ```
 
@@ -120,11 +120,11 @@ order by  count(employees.id) desc limit 5;
 
 ```
 
-select supervisor_id, count(supervisor_id) as count
-from employees
-group by supervisor_id
-order by count desc
-limit 3;
+SELECT supervisor_id, COUNT(supervisor_id) AS count
+FROM employees
+GROUP BY supervisor_id
+ORDER BY count DESC
+LIMIT 3;
 
 ```
 
@@ -136,11 +136,11 @@ limit 3;
 
 ```
 
-select count(offices.id) as list_of_office 
-from offices 
-inner join states 
-on offices.state_id = states.id 
-where states.name='Colorado';
+SELECT COUNT(offices.id) AS list_of_office 
+FROM offices 
+INNER JOIN states 
+ON offices.state_id = states.id 
+WHERE states.name='Colorado';
 
 ```
 
@@ -152,11 +152,11 @@ where states.name='Colorado';
 
 ```
 
-select offices.name, count(employees.id) 
-from offices 
-inner join employees on offices.id = employees.office_id 
-group by offices.name 
-order by count(employees.id) desc;
+SELECT offices.name, COUNT(employees.id) 
+FROM offices 
+INNER JOIN employees ON offices.id = employees.office_id 
+GROUP BY offices.name 
+ORDER BY COUNT(employees.id) DESC;
 
 ```
 
@@ -168,23 +168,23 @@ order by count(employees.id) desc;
 
 ```
 
-(select o.address, count(e.office_id) as count 
-from offices as o 
-inner join employees as e 
-on o.id=e.office_id
-group by o.address 
-order by count desc   
-limit 1)
+(SELECT o.address, COUNT(e.office_id) AS count 
+FROM offices AS o 
+INNER JOIN employees AS e 
+ON o.id=e.office_id
+GROUP BY o.address 
+ORDER BY count DESC   
+LIMIT 1)
 
-union all 
+UNION ALL 
 
-(select o.address, count(e.office_id) as count 
-from offices as o
-inner join employees as e
-on o.id=e.office_id 
-group by o.address 
-order by count  
-limit 1) ;
+(SELECT o.address, COUNT(e.office_id) AS count 
+FROM offices AS o
+INNER JOIN employees AS e
+ON o.id=e.office_id 
+GROUP BY o.address 
+ORDER BY count  
+LIMIT 1) ;
 
 ```
 
@@ -196,12 +196,12 @@ limit 1) ;
 
 ```
 
-select e.uuid, concat(e.first_name, ' ', e.last_name) as full_name, e.email, e.job_title, o.name as company, c.name as country, s.name as state, boss.first_name as boos_name
-from employees as e
-inner join employees as boss on e.supervisor_id = boss.id
-inner join offices as o on o.id = e.office_id 
-inner join countries as c on o.country_id = c.id
-inner join states as s on s.id=o.state_id;
+SELECT e.uuid, CONCAT(e.first_name, ' ', e.last_name) AS full_name, e.email, e.job_title, o.name AS company, c.name AS country, s.name AS state, boss.first_name AS boos_name
+FROM employees AS e
+INNER JOIN employees AS boss on e.supervisor_id = boss.id
+INNER JOIN offices AS o on o.id = e.office_id 
+INNER JOIN countries AS c on o.country_id = c.id
+INNER JOIN states AS s on s.id=o.state_id;
 
 ```
 
