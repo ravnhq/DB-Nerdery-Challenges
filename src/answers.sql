@@ -5,7 +5,7 @@ SELECT
     count(s.name)
 FROM
     countries c
-    RIGHT JOIN states s ON c.id = s.country_id
+    INNER JOIN states s ON c.id = s.country_id
 GROUP BY
     c.name;
 
@@ -20,23 +20,17 @@ WHERE
 -- 3
 SELECT
     c.name,
-    t.address,
-    t.count
+    o.address,
+    count(e.id)
 FROM
-    (
-        SELECT
-            o.country_id,
-            address,
-            count(o.id)
-        FROM
-            offices o
-            INNER JOIN employees e ON o.id = e.office_id
-        GROUP BY
-            o.id
-    ) t
-    INNER JOIN countries c ON t.country_id = c.id
+    offices o
+    INNER JOIN employees e ON o.id = e.office_id
+    INNER JOIN countries c ON o.country_id = c.id
+GROUP BY
+    o.address,
+    c.name
 ORDER BY
-    t.count DESC
+    count DESC
 LIMIT
     5;
 
@@ -59,8 +53,10 @@ SELECT
 FROM
     states s
     INNER JOIN offices o ON s.id = o.state_id
+    INNER JOIN countries c ON o.country_id = c.id
 WHERE
-    s.name = 'Colorado';
+    s.name = 'Colorado'
+    AND c.name = 'United States';
 
 -- 6
 SELECT
@@ -109,17 +105,17 @@ ORDER BY
 
 -- 8
 SELECT
-    e.uuid,
-    CONCAT(e.first_name, ' ', e.last_name) AS full_name,
-    e.email,
-    e.job_title,
+    employee.uuid,
+    CONCAT(employee.first_name, ' ', employee.last_name) AS full_name,
+    employee.email,
+    employee.job_title,
     o.name AS company,
     c.name AS country,
     s.name AS state,
-    e2.first_name AS boss_name
+    boss.first_name AS boss_name
 FROM
-    employees e
-    INNER JOIN offices o ON e.office_id = o.id
+    employees employee
+    INNER JOIN offices o ON employee.office_id = o.id
     INNER JOIN countries c ON o.country_id = c.id
     INNER JOIN states s ON o.state_id = s.id
-    INNER JOIN employees e2 ON e.supervisor_id = e2.id;
+    INNER JOIN employees boss ON employee.supervisor_id = boss.id;
