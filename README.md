@@ -74,7 +74,11 @@ Now it's your turn to write SQL querys to achieve the following results:
 1. Count the total number of states in each country.
 
 ```
-Your query here
+SELECT countries.name,
+       COUNT(*)
+FROM countries
+INNER JOIN states ON countries.id = states.country_id
+GROUP BY countries.name;
 ```
 
 <p align="center">
@@ -84,7 +88,9 @@ Your query here
 2. How many employees do not have supervisores.
 
 ```
-Your query here
+SELECT COUNT(*) AS employees_without_bosses
+FROM employees
+WHERE employees.supervisor_id IS NULL;
 ```
 
 <p align="center">
@@ -94,7 +100,16 @@ Your query here
 3. List the top five offices address with the most amount of employees, order the result by country and display a column with a counter.
 
 ```
-Your query here
+SELECT countries.name,
+       offices.address,
+       count(*)
+FROM employees
+INNER JOIN offices ON employees.office_id = offices.id
+INNER JOIN countries ON offices.country_id = countries.id
+GROUP BY countries.name,
+         offices.address
+ORDER BY count(*) DESC
+LIMIT 5;
 ```
 
 <p align="center">
@@ -104,7 +119,13 @@ Your query here
 4. Three supervisors with the most amount of employees they are in charge.
 
 ```
-Your query here
+SELECT supervisor.id AS supervisor_id,
+       count(*)
+FROM employees
+INNER JOIN employees AS supervisor ON employees.supervisor_id = supervisor.id
+GROUP BY supervisor.id
+ORDER BY count(*) DESC
+LIMIT 3;
 ```
 
 <p align="center">
@@ -114,7 +135,12 @@ Your query here
 5. How many offices are in the state of Colorado (United States).
 
 ```
-Your query here
+SELECT count(*) AS list_of_office
+FROM offices                                                             
+WHERE offices.state_id  IN                                              
+    (SELECT states.id
+     FROM states INNER JOIN countries ON countries.id = states.country_id
+     WHERE states.name LIKE 'Colorado%' AND countries.name='United States');
 ```
 
 <p align="center">
@@ -124,7 +150,12 @@ Your query here
 6. The name of the office with its number of employees ordered in a desc.
 
 ```
-Your query here
+SELECT offices.name,
+       count(*)
+FROM offices
+INNER JOIN employees ON offices.id = employees.office_id
+GROUP BY offices.name
+ORDER BY count(*) DESC;
 ```
 
 <p align="center">
@@ -134,7 +165,22 @@ Your query here
 7. The office with more and less employees.
 
 ```
-Your query here
+WITH number_of_employees_per_address AS
+  (SELECT offices.address,
+          count(*)
+   FROM offices
+   INNER JOIN employees ON offices.id = employees.office_id
+   GROUP BY offices.address)
+  (SELECT *
+   FROM number_of_employees_per_address
+   ORDER BY COUNT DESC
+   LIMIT 1)
+UNION ALL
+  (SELECT address,
+          COUNT
+   FROM number_of_employees_per_address
+   ORDER BY COUNT ASC
+   LIMIT 1);
 ```
 
 <p align="center">
@@ -144,7 +190,19 @@ Your query here
 8. Show the uuid of the employee, first_name and lastname combined, email, job_title, the name of the office they belong to, the name of the country, the name of the state and the name of the boss (boss_name)
 
 ```
-Your query here
+SELECT employees.uuid,
+       employees.first_name || ' ' || employees.last_name AS full_name,
+       employees.email,
+       employees.job_title,
+       offices.name AS company,
+       countries.name AS country,
+       states.name AS state,
+       boss.first_name AS boss_name
+FROM employees
+LEFT JOIN offices ON employees.office_id=offices.id
+LEFT JOIN countries ON offices.country_id = countries.id
+LEFT JOIN states ON offices.state_id = states.id
+LEFT JOIN employees AS boss ON employees.id = boss.id;
 ```
 
 <p align="center">
