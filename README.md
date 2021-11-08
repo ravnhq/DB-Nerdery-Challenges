@@ -74,7 +74,11 @@ Now it's your turn to write SQL querys to achieve the following results:
 1. Count the total number of states in each country.
 
 ```
-Your query here
+SELECT countries.name,
+       COUNT(*)
+FROM countries
+INNER JOIN states ON countries.id = states.country_id
+GROUP BY countries.name;
 ```
 
 <p align="center">
