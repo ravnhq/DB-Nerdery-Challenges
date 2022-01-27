@@ -25,6 +25,13 @@ limit 5;
 
 -- 4
 
+select supervisor_id, count(*) as count 
+from employees 
+where supervisor_id is not null 
+group by supervisor_id 
+order by count desc 
+limit 3;
+
 -- 5
 
 -- 6
