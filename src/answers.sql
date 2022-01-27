@@ -34,6 +34,10 @@ limit 3;
 
 -- 5
 
+select count(*) as list_of_office 
+from offices 
+where state_id = (select id from states where name = 'Colorado');
+
 -- 6
 
 -- 7
