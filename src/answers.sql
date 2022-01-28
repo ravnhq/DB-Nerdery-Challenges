@@ -64,9 +64,9 @@ GROUP BY o.address
 ORDER BY count ASC LIMIT 1)
 
 -- 8
-SELECT e.uuid, CONCAT(e.first_name,' ', e.last_name) as full_name, e.email, 
-e.job_title, o.name AS company, c.name AS country, s.name AS state, su.first_name as boss_name
-FROM employees e
+SELECT  e.uuid, CONCAT(e.first_name,' ', e.last_name) as full_name, e.email, 
+        e.job_title, o.name AS company, c.name AS country, s.name AS state, su.first_name as boss_name
+    FROM employees e
 INNER JOIN employees su ON (e.supervisor_id=su.id)
 INNER JOIN offices o ON (e.office_id=o.id) 
 INNER JOIN countries c ON (o.country_id=c.id) 
