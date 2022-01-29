@@ -55,4 +55,11 @@ group by off.address)
 
 (select * from employeesPerOffice order by count desc limit 1) union ( select * from employeesPerOffice order by count limit 1);
 
+-- 8
 
+select emp.uuid, CONCAT(emp.first_name, ' ', emp.last_name) as full_name, emp.email, emp.job_title, off.name as company, co.name as country, st.name as state, 
+    (select first_name from employees where id = emp.supervisor_id) as boss_name  
+from employees emp inner join offices off on emp.office_id = off.id 
+inner join countries co on off.country_id = co.id 
+inner join states st on st.id = off.state_id 
+where emp.supervisor_id is not null;
