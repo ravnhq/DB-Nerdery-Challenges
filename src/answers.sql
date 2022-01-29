@@ -14,18 +14,18 @@ where supervisor_id is null;
 
 -- 3
 
-select co.name, off.address, count(*) as count
+select co.name, off.address, count(*)
 from countries co inner join offices off
 on co.id = off.country_id
 inner join employees emp
 on off.id = emp.office_id
-group by co.name,off.address
-order by count desc, co.name desc
+group by off.address, co.name
+order by count desc
 limit 5;
 
 -- 4
 
-select supervisor_id, count(*) as count 
+select supervisor_id, count(*)
 from employees 
 where supervisor_id is not null 
 group by supervisor_id 
@@ -40,5 +40,19 @@ where state_id = (select id from states where name = 'Colorado');
 
 -- 6
 
+select off.name, count(*)
+from offices off inner join employees emp 
+on off.id = emp.office_id 
+group by off.name 
+order by count desc;
+
 -- 7
+
+with employeesPerOffice as(select off.address, count(*) 
+from offices off inner join employees emp
+on off.id = emp.office_id 
+group by off.address)
+
+(select * from employeesPerOffice order by count desc limit 1) union ( select * from employeesPerOffice order by count limit 1);
+
 
