@@ -97,7 +97,7 @@ Your query here
 ```
 
 
-4. Get the three users with the most value after making movements.
+4. Get the three users with the most money after making movements.
 
 ```
 Your query here
@@ -146,7 +146,7 @@ Your query here
 ```
 
 
-7. The name and email of the user with the highest money on his/her all accounts
+7. The name and email of the user with the highest money in all his/her accounts
 
 ```
 Your query here
