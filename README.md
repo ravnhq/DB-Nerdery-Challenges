@@ -56,6 +56,11 @@ docker exec -it -u postgres nerdery-container psql
 create database nerdery_challenge;
 ```
 
+5. Close the database connection:
+```
+\q
+```
+
 4. Restore de postgres backup file
 
 ```
@@ -71,21 +76,21 @@ cat /.../dump.sql | docker exec -i nerdery-container psql -U postgres -d nerdery
 
 Now it's your turn to write SQL queries to achieve the following results (You need to write the query in the section `Your query here` on each question):
 
-1. Total number of accounts.
+1. Total money of all the accounts group by types.
 
 ```
 Your query here
 ```
 
 
-2. How many users with at least one 2 `CURRENT_ACCOUNT`.
+2. How many users with at least 2 `CURRENT_ACCOUNT`.
 
 ```
 Your query here
 ```
 
 
-3. List the top five accounts with more amount.
+3. List the top five accounts with more money.
 
 ```
 Your query here
@@ -101,12 +106,13 @@ Your query here
 
 5. In this part you need to create a transaction with the following steps:
 
-    a. First, get the ammount for the account `3b79e403-c788-495a-a8ca-86ad7643afaf` after all their movements.
+    a. First, get the ammount for the account `3b79e403-c788-495a-a8ca-86ad7643afaf` and `fd244313-36e5-4a17-a27c-f8265bc46590` after all their movements.
     b. Add a new movement with the information:
-        type: IN
+        from: `3b79e403-c788-495a-a8ca-86ad7643afaf` make a transfer to `fd244313-36e5-4a17-a27c-f8265bc46590`
         mount: 50.75
 
     c. Add a new movement with the information:
+        from: `3b79e403-c788-495a-a8ca-86ad7643afaf` 
         type: OUT
         mount: 731823.56
 
@@ -127,6 +133,11 @@ Your query here
         Your query
     ```
 
+    e. How much money the account `fd244313-36e5-4a17-a27c-f8265bc46590` have:
+    ```
+        Your query
+    ```
+
 
 6. All the movements and the user information with the account `3b79e403-c788-495a-a8ca-86ad7643afaf`
 
@@ -135,7 +146,7 @@ Your query here
 ```
 
 
-7. The name and email of the user with the highest amount on his/her all accounts
+7. The name and email of the user with the highest money on his/her all accounts
 
 ```
 Your query here
