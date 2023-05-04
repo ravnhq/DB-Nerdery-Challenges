@@ -30,13 +30,7 @@
             ORDER BY COUNT(supervisor_id) DESC
             LIMIT 3
 
--- 5
-		SELECT COUNT(ofi.state_id) AS list_of_office
-			FROM offices ofi
-		WHERE ofi.state_id = (SELECT id 
-								FROM states
-							   WHERE name = 'Colorado')
-							
+-- 5						
 		SELECT COUNT(ofi.state_id) AS list_of_office
 			FROM offices ofi
 		INNER JOIN states sta
