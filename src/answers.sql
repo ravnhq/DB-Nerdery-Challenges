@@ -23,11 +23,41 @@ FROM accounts A
     LIMIT 5;
 
 -- 4
---select concat(name, ' ', last_name) as full_name, a.mount from users
---    inner join accounts a on users.id = a.user_id
---    order by a.mount desc limit 3;
+WITH accounts_funds AS (
+    SELECT A.id,
+           sum(B.mount) AS accounts_total
+    FROM users A
+    INNER JOIN accounts B ON A.id = B.user_id
+    GROUP BY A.id
+),
+movements_funds AS (
+    SELECT  A.id,
+            CONCAT(A.name, ' ', A.last_name) AS full_name,
+            SUM(
+               CASE
+                   WHEN C.account_to = B.id THEN C.mount
+                   WHEN C.type = 'OTHER' OR
+                        C.type = 'TRANSFER' OR
+                        C.type = 'OUT' THEN -1 * C.mount
+                   ELSE C.mount
+               END) AS movements_total
+    FROM users A
+    INNER JOIN accounts B ON A.id = B.user_id
+    INNER JOIN movements C ON B.id = C.account_from OR B.id = C.account_to
+    GROUP BY A.name, A.last_name, A.id
+)
+SELECT A.id,
+       A.full_name,
+       A.movements_total,
+       B.accounts_total,
+       (B.accounts_total + A.movements_total) AS total_after_mov
+FROM movements_funds A
+INNER JOIN accounts_funds B ON B.id = A.id
+GROUP BY A.id, A.full_name, A.movements_total, B.accounts_total
+ORDER BY total_after_mov DESC LIMIT 3;
 
 -- 5
+
 
 -- 6
 SELECT * FROM movements A
@@ -36,6 +66,13 @@ SELECT * FROM movements A
     WHERE B.id = '3b79e403-c788-495a-a8ca-86ad7643afaf';
 
 -- 7
+SELECT A.name,
+       A.email,
+       sum(B.mount) AS total_funds
+FROM users A
+INNER JOIN accounts B ON A.id = B.user_id
+GROUP BY A.id, A.name, A.email
+ORDER BY total_funds DESC LIMIT 1;
 
 -- 8
 SELECT * FROM movements A
