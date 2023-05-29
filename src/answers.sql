@@ -49,10 +49,10 @@ SELECT
     (em.first_name || ' ' || em.last_name) full_name,
     em.email,
     em.job_title,
-    of.name                                company,
-    co.name                                country,
-    sta.name                               state,
-    em_sup.first_name                         boss_name
+    of.name company,
+    co.name country,
+    sta.name state,
+    em_sup.first_name boss_name
 FROM employees em
     JOIN offices of ON of.id = em.office_id
     JOIN countries co ON co.id = of.country_id
