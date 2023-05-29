@@ -20,8 +20,8 @@ SELECT account_user_id, user_name, total_mount, (total_mount + SUM(final_mount))
                 ELSE m.mount
             END final_mount
         FROM users u
-            JOIN accounts a on u.id = a.user_id
-            JOIN movements m on a.id = m.account_from OR a.id = m.account_to
+            JOIN accounts a ON u.id = a.user_id
+            JOIN movements m ON a.id = m.account_from OR a.id = m.account_to
     ) AS accounts_with_movements
     JOIN (
         SELECT user_id, SUM(mount) total_mount FROM accounts GROUP BY user_id
@@ -47,8 +47,8 @@ BEGIN TRANSACTION;
                                 ELSE m.mount
                             END final_mount
                         FROM users u
-                            JOIN accounts a on u.id = a.user_id
-                            JOIN movements m on a.id = m.account_from OR a.id = m.account_to
+                            JOIN accounts a ON u.id = a.user_id
+                            JOIN movements m ON a.id = m.account_from OR a.id = m.account_to
                             WHERE a.id = param_account_id
                     ) AS accounts_with_movements
                         JOIN (
@@ -76,6 +76,8 @@ BEGIN TRANSACTION;
                         VALUES (gen_random_uuid(), 'OUT', '3b79e403-c788-495a-a8ca-86ad7643afaf', null, 731823.56);
                 ELSE
                     --- d.
+                    -- The transaction fails because there is not sufficient money on the bank account
+                    -- The answer is YES
                     BEGIN
                         RAISE EXCEPTION 'Operation failed - Insufficient amount';
                     --- e.
@@ -97,12 +99,12 @@ SELECT
     a.id user_accound_id,
     m.id movement_id, m.type movement_type, m.account_from, m.account_to, m.mount movement_mount
 FROM accounts a
-    JOIN users u on u.id = a.user_id
-    JOIN movements m on a.id = m.account_from OR a.id = m.account_to
+    JOIN users u ON u.id = a.user_id
+    JOIN movements m ON a.id = m.account_from OR a.id = m.account_to
     WHERE a.id = '3b79e403-c788-495a-a8ca-86ad7643afaf';
 -- 7
 SELECT u.name, u.email FROM accounts a
-    JOIN users u on u.id = a.user_id
+    JOIN users u ON u.id = a.user_id
     GROUP BY u.name, u.email
     ORDER BY SUM(a.mount) DESC
     LIMIT 1;
@@ -112,7 +114,7 @@ SELECT
     a.type account_type,
     m.id movement_id, m.type movement_type, m.created_at movement_created_at
 FROM users u
-    JOIN accounts a on u.id = a.user_id
-    JOIN movements m on a.id = m.account_from OR a.id = m.account_to
+    JOIN accounts a ON u.id = a.user_id
+    JOIN movements m ON a.id = m.account_from OR a.id = m.account_to
     WHERE u.email = 'Kaden.Gusikowski@gmail.com'
     ORDER BY a.type, m.created_at;
