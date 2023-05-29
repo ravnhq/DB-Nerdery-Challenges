@@ -22,6 +22,8 @@ SELECT supervisor_id, COUNT(supervisor_id) count FROM employees
 SELECT COUNT(id) list_of_office FROM offices
     WHERE state_id = (
         SELECT id FROM states WHERE name = 'Colorado'
+    ) AND country_id = (
+        SELECT id FROM countries WHERE name = 'United States'
     );
 -- 6
 SELECT o.name, COUNT(e.id) count FROM employees e
@@ -43,16 +45,16 @@ UNION
 ORDER BY count DESC;
 -- 8
 SELECT
-    e.uuid,
-    (e.first_name || ' ' || e.last_name) fullname,
-    e.email,
-    e.job_title,
-    o.name company,
-    c.name country,
-    s.name state,
-    e2.first_name boss_name
-FROM employees e
-    JOIN offices o ON o.id = e.office_id
-    JOIN countries c ON c.id = o.country_id
-    JOIN states s ON s.id = o.state_id
-    JOIN employees e2 ON e2.id = e.supervisor_id
+    em.uuid,
+    (em.first_name || ' ' || em.last_name) full_name,
+    em.email,
+    em.job_title,
+    of.name                                company,
+    co.name                                country,
+    sta.name                               state,
+    em_sup.first_name                         boss_name
+FROM employees em
+    JOIN offices of ON of.id = em.office_id
+    JOIN countries co ON co.id = of.country_id
+    JOIN states sta ON sta.id = of.state_id
+    JOIN employees em_sup ON em_sup.id = em.supervisor_id
