@@ -64,7 +64,7 @@ UNION ALL
  LIMIT 1);
 
  -- 8
- SELECT em.uuid,
+SELECT em.uuid,
        CONCAT(em.first_name, ' ', em.last_name) as full_name,
        em.email,
        em.job_title,
@@ -73,11 +73,10 @@ UNION ALL
        st.name                                  as state,
        su.first_name                            as boss_name
 FROM employees em
-         INNER JOIN offices of
+         LEFT JOIN offices of
                     ON of.id = em.id
          INNER JOIN countries co
                     ON co.id = of.country_id
          INNER JOIN states st
                     ON st.id = of.state_id
-         INNER JOIN employees su ON em.supervisor_id = su.id
-WHERE em.supervisor_id IS NOT NULL;
+         LEFT JOIN employees su ON em.supervisor_id = su.id;
