@@ -1,6 +1,6 @@
 <p align="center" style="background-color:white">
  <a href="https://www.ravn.co/" rel="noopener">
- <img src="https://www.ravn.co/img/logo-ravn.png" alt="RAVN logo"></a>
+ <img src="src/ravn_logo.png" alt="RAVN logo" width="150px"></a>
 </p>
 <p align="center">
  <a href="https://www.postgresql.org/" rel="noopener">
@@ -41,7 +41,7 @@ Open your terminal and run the follows commands:
 1. This will create a container for postgresql:
 
 ```
-docker run --name nerdery-container -e POSTGRES_PASSWORD=password123 -p 5432:5432 -d --rm postgres:13.0
+docker run --name nerdery-container -e POSTGRES_PASSWORD=password123 -p 5432:5432 -d --rm postgres:15.2
 ```
 
 2. Now, we access the container:
@@ -56,10 +56,15 @@ docker exec -it -u postgres nerdery-container psql
 create database nerdery_challenge;
 ```
 
+5. Close the database connection:
+```
+\q
+```
+
 4. Restore de postgres backup file
 
 ```
-cat /.../src/dump.sql | docker exec -i nerdery-container psql -U postgres -d nerdery_challenge
+cat /.../dump.sql | docker exec -i nerdery-container psql -U postgres -d nerdery_challenge
 ```
 
 - Note: The `...` mean the location where the src folder is located on your computer
@@ -69,84 +74,263 @@ cat /.../src/dump.sql | docker exec -i nerdery-container psql -U postgres -d ner
 
 ## 📊 Excersises <a name = "excersises"></a>
 
-Now it's your turn to write SQL querys to achieve the following results:
+Now it's your turn to write SQL queries to achieve the following results (You need to write the query in the section `Your query here` on each question):
 
-1. Count the total number of states in each country.
-
-```
-Your query here
-```
-
-<p align="center">
- <img src="src/results/result1.png" alt="result_1"/>
-</p>
-
-2. How many employees do not have supervisores.
+1. Total money of all the accounts group by types.
 
 ```
-Your query here
+SELECT type, SUM(mount) 
+FROM accounts 
+GROUP BY type 
 ```
 
-<p align="center">
- <img src="src/results/result2.png" alt="result_2"/>
-</p>
 
-3. List the top five offices address with the most amount of employees, order the result by country and display a column with a counter.
+2. How many users with at least 2 `CURRENT_ACCOUNT`.
 
 ```
-Your query here
+WITH AccountTotal AS (
+    SELECT a.user_id, COUNT(a.account_id)
+    FROM accounts AS a
+    WHERE a.type = 'CURRENT_ACCOUNT'
+    GROUP BY a.user_id
+)
+SELECT COUNT(user_id) AS total_accounts_multiple_current
+FROM AccountTotal
+WHERE COUNT > 1;
 ```
 
-<p align="center">
- <img src="src/results/result3.png" alt="result_3"/>
-</p>
 
-4. Three supervisors with the most amount of employees they are in charge.
+3. List the top five accounts with more money.
 
 ```
-Your query here
+SELECT concat(u.name, ' ', u.last_name) AS user, a.account_id, a.mount
+FROM accounts AS a
+JOIN users AS u ON a.user_id = u.id 
+ORDER BY mount DESC
+LIMIT 5
 ```
 
-<p align="center">
- <img src="src/results/result4.png" alt="result_4"/>
-</p>
 
-5. How many offices are in the state of Colorado (United States).
+4. Get the three users with the most money after making movements.
 
 ```
-Your query here
+SELECT u.name,
+       SUM(Case
+               WHEN m.type = 'IN' THEN m.mount
+               WHEN m.type = 'OUT' THEN -m.mount
+               WHEN m.type = 'OTHER' THEN -m.mount
+               else
+                   COALESCE(CASE WHEN m.account_to = a.id THEN m.mount ELSE 0 END, 0) -
+                   COALESCE(CASE WHEN m.account_from = a.id THEN m.mount ELSE 0 END, 0)
+           END
+       ) AS total_balance
+FROM users AS u
+JOIN accounts AS a ON u.id = a.user_id
+JOIN movements AS m ON a.id = m.account_from OR a.id = m.account_to
+GROUP BY u.id
+ORDER BY total_balance DESC
+LIMIT 3
+;
 ```
 
-<p align="center">
- <img src="src/results/result5.png" alt="result_5"/>
-</p>
 
-6. The name of the office with its number of employees ordered in a desc.
+5. In this part you need to create a transaction with the following steps:
+
+    a. First, get the ammount for the account `3b79e403-c788-495a-a8ca-86ad7643afaf` and `fd244313-36e5-4a17-a27c-f8265bc46590` after all their movements.
+    
+    b. Add a new movement with the information:
+        from: `3b79e403-c788-495a-a8ca-86ad7643afaf` make a transfer to `fd244313-36e5-4a17-a27c-f8265bc46590`
+        mount: 50.75
+
+    c. Add a new movement with the information:
+        from: `3b79e403-c788-495a-a8ca-86ad7643afaf` 
+        type: OUT
+        mount: 731823.56
+
+        * Note: if the account does not have enough money you need to reject this insert and make a rollback for the entire transaction
+    
+    d. Put your answer here if the transaction fails(YES/NO):
+    ```
+        Yes, because the amount exceeds the avialable funds the user has.
+    ```
+
+    e. If the transaction fails, make the correction on step _c_ to avoid the failure:
+    ```
+        DO $$
+            DECLARE
+                user_balance DOUBLE PRECISION;
+
+            BEGIN
+            
+            SELECT mount 
+            INTO user_balance 
+            FROM accounts 
+            WHERE id = '3b79e403-c788-495a-a8ca-86ad7643afaf';
+            
+            IF user_balance > 731823.56 THEN
+                INSERT INTO movements (id, type, account_from, account_to, mount, created_at, updated_at)
+                VALUES (
+                    uuid_generate_v4(),
+                    'OUT',
+                    '3b79e403-c788-495a-a8ca-86ad7643afaf',
+                    NULL,
+                    731823.56,
+                    NOW(),
+                    NOW()
+                );
+            ELSE
+                RAISE EXCEPTION 'Insufficient funds for user';
+            END IF;
+
+        COMMIT;
+
+    EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+    END $$;
+    ```
+
+    f. Once the transaction is correct, make a commit
+    ```
+    UPDATE accounts
+    SET mount = (
+        SELECT SUM(Case
+                   WHEN m.type = 'IN' THEN m.mount
+                   WHEN m.type = 'OUT' THEN -m.mount
+                   WHEN m.type = 'OTHER' THEN -m.mount
+                   else
+                       COALESCE(CASE WHEN m.account_to = a.id THEN m.mount ELSE 0 END, 0) -
+                       COALESCE(CASE WHEN m.account_from = a.id THEN m.mount ELSE 0 END, 0)
+               END
+           ) AS balance
+        FROM accounts AS a
+        JOIN movements AS m ON a.id = m.account_from
+        WHERE a.id = '3b79e403-c788-495a-a8ca-86ad7643afaf'
+    )
+    WHERE id = '3b79e403-c788-495a-a8ca-86ad7643afaf';
+
+    UPDATE accounts
+    SET mount = (
+        SELECT SUM(Case
+                   WHEN m.type = 'IN' THEN m.mount
+                   WHEN m.type = 'OUT' THEN -m.mount
+                   WHEN m.type = 'OTHER' THEN -m.mount
+                   else
+                       COALESCE(CASE WHEN m.account_to = a.id THEN m.mount ELSE 0 END, 0) -
+                       COALESCE(CASE WHEN m.account_from = a.id THEN m.mount ELSE 0 END, 0)
+               END
+           ) AS balance
+        FROM accounts AS a
+        JOIN movements AS m ON a.id = m.account_from
+        WHERE a.id = 'fd244313-36e5-4a17-a27c-f8265bc46590'
+    )
+    WHERE id = 'fd244313-36e5-4a17-a27c-f8265bc46590';
+
+    INSERT INTO movements (id, type, account_from, account_to, mount, created_at, updated_at)
+    VALUES (
+        gen_random_uuid(),
+        'TRANSFER',
+        '3b79e403-c788-495a-a8ca-86ad7643afaf',
+        'fd244313-36e5-4a17-a27c-f8265bc46590',
+        50.75,
+        NOW(),
+        NOW()
+    );
+
+    UPDATE accounts
+    SET mount = (
+        SELECT SUM(a.mount - 50.75) AS balance
+        FROM accounts AS a
+        JOIN movements AS m ON a.id = m.account_from
+        WHERE a.id = '3b79e403-c788-495a-a8ca-86ad7643afaf'
+    )
+    WHERE id = '3b79e403-c788-495a-a8ca-86ad7643afaf';
+
+    DO $$
+        DECLARE
+            user_balance DOUBLE PRECISION;
+
+        BEGIN
+        
+        SELECT mount 
+        INTO user_balance 
+        FROM accounts 
+        WHERE id = '3b79e403-c788-495a-a8ca-86ad7643afaf';
+        
+        IF user_balance > 731823.56 THEN
+            INSERT INTO movements (id, type, account_from, account_to, mount, created_at, updated_at)
+            VALUES (
+                uuid_generate_v4(),
+                'OUT',
+                '3b79e403-c788-495a-a8ca-86ad7643afaf',
+                NULL,
+                731823.56,
+                NOW(),
+                NOW()
+            );
+        ELSE
+            RAISE EXCEPTION 'Insufficient funds for user';
+        END IF;
+
+    COMMIT;
+
+    EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+    END $$;
+    ```
+
+    e. How much money the account `fd244313-36e5-4a17-a27c-f8265bc46590` have:
+    ```
+    SELECT concat(u.name, ' ', u.last_name) AS user, SUM((CASE WHEN m.type = 'IN' THEN m.mount ELSE - m.mount END) + a.mount) AS net_amount
+    FROM users AS u
+    JOIN accounts AS a ON u.id = a.user_id
+    JOIN movements AS m ON m.account_from = a.id
+    WHERE a.id = 'fd244313-36e5-4a17-a27c-f8265bc46590'
+    GROUP BY u.name, u.last_name, u.email
+    ORDER BY net_amount DESC;
+    ```
+
+
+6. All the movements and the user information with the account `3b79e403-c788-495a-a8ca-86ad7643afaf`
 
 ```
-Your query here
+SELECT concat(u.name, ' ', u.last_name) AS user, u.email, a.account_id, a.mount, m.account_to, m.account_from, m.mount, m.type
+FROM users AS u
+JOIN accounts AS a ON u.id = a.user_id
+JOIN movements AS m ON a.id = m.account_to OR a.id = m.account_from
+WHERE a.id = '3b79e403-c788-495a-a8ca-86ad7643afaf';
 ```
 
-<p align="center">
- <img src="src/results/result6.png" alt="result_6"/>
-</p>
 
-7. The office with more and less employees.
+7. The name and email of the user with the highest money in all his/her accounts
 
 ```
-Your query here
+SELECT concat(u.name, ' ', u.last_name) AS user, u.email, SUM(Case
+                   WHEN m.type = 'IN' THEN m.mount
+                   WHEN m.type = 'OUT' THEN -m.mount
+                   WHEN m.type = 'OTHER' THEN -m.mount
+                   else
+                       COALESCE(CASE WHEN m.account_to = a.id THEN m.mount ELSE 0 END, 0) -
+                       COALESCE(CASE WHEN m.account_from = a.id THEN m.mount ELSE 0 END, 0)
+               END
+           ) AS net_amount
+FROM users AS u
+JOIN accounts AS a ON u.id = a.user_id
+JOIN movements AS m ON m.account_from = a.id
+GROUP BY u.name, u.last_name, u.email
+ORDER BY net_amount DESC
+LIMIT 1;
 ```
 
-<p align="center">
- <img src="src/results/result7.png" alt="result_7"/>
-</p>
 
-8. Show the uuid of the employee, first_name and lastname combined, email, job_title, the name of the office they belong to, the name of the country, the name of the state and the name of the boss (boss_name)
+8. Show all the movements for the user `Kaden.Gusikowski@gmail.com` order by account type and created_at on the movements table
 
 ```
-Your query here
+SELECT u.email, m.type, a.account_id, m.account_from, m.account_to, m.created_at
+FROM movements AS m
+JOIN accounts AS a ON m.account_from = a.id OR m.account_to = a.id
+JOIN users AS u ON a.user_id = u.id
+WHERE u.email = 'Kaden.Gusikowski@gmail.com'
+ORDER BY a.type, m.created_at DESC;
 ```
-
-<p align="center">
- <img src="src/results/result8.png" alt="result_8"/>
-</p>
