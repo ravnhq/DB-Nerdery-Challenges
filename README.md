@@ -73,8 +73,14 @@ Now it's your turn to write SQL querys to achieve the following results:
 
 1. Count the total number of states in each country.
 
-```
-Your query here
+```postgresql
+select
+    countries.name ,
+    count(states)
+from states
+         left join countries on states.country_id = countries.id
+group by
+    countries.name;
 ```
 
 <p align="center">
@@ -83,8 +89,10 @@ Your query here
 
 2. How many employees do not have supervisores.
 
-```
-Your query here
+```postgresql
+select count(*) as employees_without_bosses
+from employees
+where supervisor_id IS NULL;
 ```
 
 <p align="center">
@@ -93,8 +101,20 @@ Your query here
 
 3. List the top five offices address with the most amount of employees, order the result by country and display a column with a counter.
 
-```
-Your query here
+```postgresql
+select
+    countries.name,
+    offices.address,
+    count(office_id)
+from employees
+         left join offices on employees.office_id = offices.id
+         left join countries on offices.country_id = countries.id
+group by
+    offices.address,
+    countries.name
+order by
+    count(office_id) desc
+    limit 5;
 ```
 
 <p align="center">
@@ -103,8 +123,16 @@ Your query here
 
 4. Three supervisors with the most amount of employees they are in charge.
 
-```
-Your query here
+```postgresql
+select
+    supervisor_id,
+    count(supervisor_id)
+from employees
+group by
+    supervisor_id
+order by
+    count(supervisor_id) desc
+    limit 3;
 ```
 
 <p align="center">
@@ -113,8 +141,13 @@ Your query here
 
 5. How many offices are in the state of Colorado (United States).
 
-```
-Your query here
+```postgresql
+select
+    count(*) as list_of_office
+from offices
+         left join states on offices.state_id = states.id
+where
+    states.name = 'Colorado';
 ```
 
 <p align="center">
@@ -123,8 +156,16 @@ Your query here
 
 6. The name of the office with its number of employees ordered in a desc.
 
-```
-Your query here
+```postgresql
+select
+    offices.name,
+    count(office_id)
+from employees
+         left join offices on offices.id = employees.office_id
+group by
+    offices.name
+order by
+    count(office_id) desc;
 ```
 
 <p align="center">
@@ -133,8 +174,32 @@ Your query here
 
 7. The office with more and less employees.
 
-```
-Your query here
+```postgresql
+
+(select
+     offices.address,
+     count(office_id)
+ from employees
+          left join offices on offices.id = employees.office_id
+ group by
+     offices.address
+ order by
+     count(office_id) desc
+ limit 1)
+
+union
+
+(select
+     offices.address,
+     count(office_id)
+ from employees
+          left join offices on offices.id = employees.office_id
+ group by
+     offices.address
+ order by
+     count(office_id) asc
+ limit 1);
+
 ```
 
 <p align="center">
@@ -143,8 +208,23 @@ Your query here
 
 8. Show the uuid of the employee, first_name and lastname combined, email, job_title, the name of the office they belong to, the name of the country, the name of the state and the name of the boss (boss_name)
 
-```
-Your query here
+```postgresql
+select
+    e.uuid,
+    e.first_name || ' ' || e.last_name as full_name,
+    e.email,
+    e.job_title,
+    offices.name as company,
+    countries.name as country,
+    states.name as state,
+    supervisors.first_name
+from employees as e
+         left join offices on offices.id = e.office_id
+         left join countries on offices.country_id = countries.id
+         left join states on offices.state_id = states.id
+         left join employees as supervisors on e.supervisor_id = supervisors.id
+where
+    e.supervisor_id is not null;
 ```
 
 <p align="center">
