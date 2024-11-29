@@ -79,28 +79,124 @@ Now it's your turn to write SQL queries to achieve the following results (You ne
 1. Total money of all the accounts group by types.
 
 ```
-Your query here
+select a.type, sum(a.mount) from accounts a group by a.type;
 ```
 
 
 2. How many users with at least 2 `CURRENT_ACCOUNT`.
 
 ```
-Your query here
+select count(*) from (select count(*) from accounts a 
+where a."type" = 'CURRENT_ACCOUNT'
+group by a.user_id
+having count(a.user_id) >= 2);
 ```
 
 
 3. List the top five accounts with more money.
 
 ```
-Your query here
+select u.id, sum(a.mount) from users u 
+inner join accounts a on u.id = a.user_id
+group by u.id 
+order by sum(a.mount) desc limit 3; 
 ```
 
 
 4. Get the three users with the most money after making movements.
 
 ```
-Your query here
+create or replace function credit_mount(i uuid, m float8)
+returns float8
+language plpgsql
+as
+$$
+declare
+balance float8;
+begin 
+update accounts
+set mount = mount + m
+where id = i;
+
+select mount into balance from accounts where id = i;
+
+return balance;
+
+end;
+$$;
+
+create or replace function debit_mount(i uuid, m float8) 
+returns float8
+language plpgsql
+as
+$$
+declare
+current_balance float8;
+begin
+select mount into current_balance from accounts where id = i;
+
+if current_balance >= m then
+update accounts 
+set mount = mount - m
+where id = i;
+return current_balance - m;
+
+else
+return -1;
+end if;
+end;
+$$;
+
+do
+$$
+declare r record;
+begin
+for r in select * from movements m where "type" = 'IN'
+loop
+perform credit_mount(r.account_from, r.mount);
+end loop;
+end;
+$$;
+
+do
+$$
+declare r record;
+declare b float8;
+begin
+for r in select * from movements m where "type" = 'OUT' or "type" = 'OTHER'
+loop
+b := debit_mount(r.account_from, r.mount);
+if b > 0 then
+continue;
+else
+perform credit_mount(r.account_from, r.mount);
+end if;
+end loop;
+end;
+$$;
+
+do
+$$
+declare r record;
+declare b float8;
+begin
+for r in select * from movements m where "type" = 'TRANSFER'
+loop
+b := debit_mount(r.account_from, r.mount);
+if b > 0 then
+perform credit_mount(r.account_to, r.mount);
+continue;
+else
+perform credit_mount(r.account_from, r.mount);
+end if;
+end loop;
+end;
+$$;
+
+select u.id, sum(a.mount) from users u 
+inner join accounts a on u.id = a.user_id
+group by u.id 
+order by sum(a.mount) desc limit 3;
 ```
 
 
@@ -116,46 +212,110 @@ Your query here
         type: OUT
         mount: 731823.56
 
-        * Note: if the account does not have enough money you need to reject this insert and make a rollback for the entire transaction
+        insert into movements (id, "type", account_from, account_to, mount, created_at, updated_at)
+        values (gen_random_uuid(), 'TRANSFER', '3b79e403-c788-495a-a8ca-86ad7643afaf', 'fd244313-36e5-4a17-a27c-f8265bc46590', 50.75, now(), now());
+        do
+        $$
+        declare r record;
+        declare b float8;
+        begin
+        for r in select * from movements m where id = '068ef2b5-a3c4-4d68-b598-702a6b0fa99f'
+        loop
+        b := debit_mount(r.account_from, r.mount);
+        if b > 0 then
+        perform credit_mount(r.account_to, r.mount);
+        continue;
+        else
+        perform credit_mount(r.account_from, r.mount);
+        end if;
+        end loop;
+        end;
+        $$;
+        
+        do
+        $$
+        declare b float8;
+        declare m float8 = 731823.56;
+        declare idacc uuid = '3b79e403-c788-495a-a8ca-86ad7643afaf';
+        begin
+        select mount into b from accounts where id = idacc;
+        insert into movements (id, "type", account_from, account_to, mount, created_at, updated_at)
+        values (gen_random_uuid(), 'OUT', idacc, null, m, now(), now());
+        if m > b then
+        RAISE NOTICE 'Not enough funds';
+        rollback;
+        else
+        commit;
+        end if;
+        end;
+        $$;
     
     d. Put your answer here if the transaction fails(YES/NO):
     ```
-        Your answer
+        YES, it failed
     ```
 
     e. If the transaction fails, make the correction on step _c_ to avoid the failure:
     ```
-        Your query
+        do
+        $$
+        declare b float8;
+        declare m float8 = 47.66;
+        declare idacc uuid = '3b79e403-c788-495a-a8ca-86ad7643afaf';
+        begin
+        select mount into b from accounts where id = idacc;
+        insert into movements (id, "type", account_from, account_to, mount, created_at, updated_at)
+        values (gen_random_uuid(), 'OUT', idacc, null, m, now(), now());
+        if m > b then
+        RAISE NOTICE 'Not enough funds';
+        rollback;
+        else
+        commit;
+        end if;
+        end;
+        $$;
     ```
 
     f. Once the transaction is correct, make a commit
     ```
-        Your query
+        commit is exeuted by an IF statement in the last query
     ```
 
     e. How much money the account `fd244313-36e5-4a17-a27c-f8265bc46590` have:
     ```
-        Your query
+        select mount from accounts a where id = 'fd244313-36e5-4a17-a27c-f8265bc46590'; ---3265.73
     ```
 
 
-6. All the movements and the user information with the account `3b79e403-c788-495a-a8ca-86ad7643afaf`
+7. All the movements and the user information with the account `3b79e403-c788-495a-a8ca-86ad7643afaf`
 
 ```
-Your query here
+select u.id user_id, u."name", u.last_name, u.email, u.date_joined, m.id, m."type", m.account_from, m.account_to, m.mount from movements m
+left join accounts a on a.id = m.account_from 
+left join accounts a2 on a2.id = m.account_to
+left join users u on u.id = a.user_id
+where m.account_from = '3b79e403-c788-495a-a8ca-86ad7643afaf' or m.account_to = '3b79e403-c788-495a-a8ca-86ad7643afaf';
 ```
 
 
 7. The name and email of the user with the highest money in all his/her accounts
 
 ```
-Your query here
+select concat(u."name", ' ', u.last_name) , u.email from users u 
+inner join accounts a on u.id = a.user_id
+group by u.id 
+order by sum(a.mount) desc limit 1;
 ```
 
 
 8. Show all the movements for the user `Kaden.Gusikowski@gmail.com` order by account type and created_at on the movements table
 
 ```
-Your query here
+select m.id, m."type", a."type" account_type, m.account_from, m.account_to, m.mount, m.created_at from movements m
+left join accounts a on a.id = m.account_from 
+left join accounts a2 on a2.id = m.account_to
+where a.user_id = (select u.id from users u where u.email = 'Kaden.Gusikowski@gmail.com') or a2.user_id = (select u.id from users u where u.email = 'Kaden.Gusikowski@gmail.com')
+order by a."type", m.created_at;
 ```
 
+Challenge 3 link: https://dbdiagram.io/d/EDR-Challenge-3-674a25dbe9daa85aca2d1246
