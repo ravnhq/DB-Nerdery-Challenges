@@ -78,31 +78,221 @@ Now it's your turn to write SQL queries to achieve the following results (You ne
 
 1. Total money of all the accounts group by types.
 
-```
-Your query here
+```postgresql
+select
+    type,
+    sum(mount)
+from accounts
+group by
+    type;
 ```
 
 
 2. How many users with at least 2 `CURRENT_ACCOUNT`.
 
-```
-Your query here
+```postgresql
+select
+    count(*)
+from
+    (
+        select
+            count(user_id) as count
+        from
+            accounts
+        where
+            type = 'CURRENT_ACCOUNT'
+        group by
+            user_id
+    ) as target
+where
+    count >= 2;
 ```
 
 
 3. List the top five accounts with more money.
 
-```
-Your query here
+```postgresql
+select
+    *
+from
+    accounts
+order by
+    mount desc
+limit 5;
 ```
 
 
 4. Get the three users with the most money after making movements.
 
+```postgresql
+-- 4 SUBQUERY VERSION
+select
+    u.id,
+    u.name,
+    u.last_name,
+    u.email,
+    u.date_joined,
+    u.created_at,
+    u.updated_at
+from
+    (
+        select
+            account,
+            ROUND(
+                    sum(mount):: numeric,
+                    2
+            ) as mount
+        from
+            (
+                (
+                    -- deposits
+                    select
+                        account_from as account,
+                        mount
+                    from
+                        movements
+                    where
+                        type = 'IN'
+                    order by
+                        type
+                )
+                union all
+                (
+                    -- withdrawals
+                    select
+                        account_from as account,
+                        mount * -1 as mount
+                    from
+                        movements
+                    where
+                        type in ('OUT', 'OTHER')
+                    order by
+                        type
+                )
+                union all
+                (
+                    -- outbound transfers
+                    select
+                        account_from as account,
+                        mount * -1 as mount
+                    from
+                        movements
+                    where
+                        type = 'TRANSFER'
+                )
+                union all
+                (
+                    -- inbound transfers
+                    select
+                        account_to as account,
+                        mount
+                    from
+                        movements
+                    where
+                        type = 'TRANSFER'
+                )
+                union all
+                (
+                    -- starting balances
+                    select
+                        id as account,
+                        mount
+                    from
+                        accounts
+                )
+            ) as target
+        group by
+            account
+        order by
+            mount desc
+        limit
+            3
+    ) as top
+        left join accounts on accounts.id = top.account
+        left join users as u on accounts.user_id = u.id;
 ```
-Your query here
+```postgresql
+-- 4 WITH CTE VERSION
+WITH processed_movements(account, mount) as (
+    (
+        -- deposits
+        select
+            account_from as account,
+            mount
+        from
+            movements
+        where
+            type = 'IN'
+        order by
+            type
+    )
+    union all
+    (
+        -- withdrawals
+        select
+            account_from as account,
+            mount * -1 as mount
+        from
+            movements
+        where
+            type in ('OUT', 'OTHER')
+        order by
+            type
+    )
+    union all
+    (
+        -- outbound transfers
+        select
+            account_from as account,
+            mount * -1 as mount
+        from
+            movements
+        where
+            type = 'TRANSFER'
+    )
+    union all
+    (
+        -- inbound transfers
+        select
+            account_to as account,
+            mount
+        from
+            movements
+        where
+            type = 'TRANSFER'
+    )
+    union all
+    (
+        -- starting balances
+        select
+            id as account,
+            mount
+        from
+            accounts
+    )
+),
+     top(account, mount) as (
+         select
+             account,
+             ROUND(
+                     sum(mount):: numeric,
+                     2
+             ) as mount
+         from
+             processed_movements
+         group by
+             account
+         order by
+             mount desc
+         limit 3
+     )
+select
+    u.*
+from
+    top
+        left join accounts on accounts.id = top.account
+        left join users as u on accounts.user_id = u.id;
 ```
-
 
 5. In this part you need to create a transaction with the following steps:
 
@@ -115,47 +305,159 @@ Your query here
         from: `3b79e403-c788-495a-a8ca-86ad7643afaf` 
         type: OUT
         mount: 731823.56
+    ```postgresql
+        --Code does not display correctly please see answers.sql for the code.
+   ```
 
         * Note: if the account does not have enough money you need to reject this insert and make a rollback for the entire transaction
     
     d. Put your answer here if the transaction fails(YES/NO):
-    ```
-        Your answer
+    ```postgresql
+        --YES with my exception after checks added to fulfill the note above.
     ```
 
     e. If the transaction fails, make the correction on step _c_ to avoid the failure:
-    ```
-        Your query
+    ```postgresql
+        insert into movements(id, type,account_from,account_to,mount)
+        values(
+        gen_random_uuid(),
+        'OUT',
+        '3b79e403-c788-495a-a8ca-86ad7643afaf',
+        DEFAULT,
+        --5.e. If the transaction fails, make the correction on step c to avoid the failure:
+        --731823.56, -- 5.e correction is to make amount lower. Or could also be a deposit (IN).
+        123);
     ```
 
     f. Once the transaction is correct, make a commit
-    ```
-        Your query
+    ```postgresql
+        -- 5.f. Once the transaction is correct, make a commit
+        COMMIT;
     ```
 
     e. How much money the account `fd244313-36e5-4a17-a27c-f8265bc46590` have:
-    ```
-        Your query
+    ```postgresql
+   -- CODE DISPLAY IS BROKEN PLEASE SEE ANSWERS.SQL INSTEAD
+       
     ```
 
 
 6. All the movements and the user information with the account `3b79e403-c788-495a-a8ca-86ad7643afaf`
 
-```
-Your query here
+```postgresql
+-- My understanding is that we don't want a big table with all the info, 
+-- thus two queries for two tables.
+-- movements
+select * from movements
+where
+    ('3b79e403-c788-495a-a8ca-86ad7643afaf') in (account_from, account_to);
+-- user info
+select *
+from users
+where
+    id = (select user_id
+          from accounts
+          where accounts.id = '3b79e403-c788-495a-a8ca-86ad7643afaf');
 ```
 
 
 7. The name and email of the user with the highest money in all his/her accounts
 
-```
-Your query here
+```postgresql
+WITH processed_movements(account, mount) as (
+    (
+        -- deposits
+        select
+            account_from as account,
+            mount
+        from
+            movements
+        where
+            type = 'IN'
+        order by
+            type
+    )
+    union all
+    (
+        -- withdrawals
+        select
+            account_from as account,
+            mount * -1 as mount
+        from
+            movements
+        where
+            type in ('OUT', 'OTHER')
+        order by
+            type
+    )
+    union all
+    (
+        -- outbound transfers
+        select
+            account_from as account,
+            mount * -1 as mount
+        from
+            movements
+        where
+            type = 'TRANSFER'
+    )
+    union all
+    (
+        -- inbound transfers
+        select
+            account_to as account,
+            mount
+        from
+            movements
+        where
+            type = 'TRANSFER'
+    )
+    union all
+    (
+        -- starting balances
+        select
+            id as account,
+            mount
+        from
+            accounts
+    )
+),
+     top(account, mount) as (
+         select
+             account,
+             ROUND(
+                     sum(mount):: numeric,
+                     2
+             ) as mount
+         from
+             processed_movements
+         group by
+             account
+         order by
+             mount desc
+         limit 1
+     )
+select
+    u.*
+from
+    top
+        left join accounts on accounts.id = top.account
+        left join users as u on accounts.user_id = u.id;
 ```
 
 
 8. Show all the movements for the user `Kaden.Gusikowski@gmail.com` order by account type and created_at on the movements table
 
-```
-Your query here
+```postgresql
+-- 8. Show all the movements for the user Kaden.Gusikowski@gmail.com order by account type and created_at on the movements table
+select * from 
+users
+left join accounts on accounts.user_id = users.id
+left join movements on accounts.id IN  (movements.account_from, movements.account_to)
+where
+users.email = 'Kaden.Gusikowski@gmail.com'
+order by
+    accounts.type,
+	movements.created_at;
 ```
 
