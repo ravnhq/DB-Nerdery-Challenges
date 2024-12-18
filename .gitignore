@@ -1,3 +1,6 @@
 solutions.sql
 data.sql
 schema.sql
+
+## Config
+*.yml
