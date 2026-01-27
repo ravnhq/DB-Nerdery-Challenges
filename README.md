@@ -57,6 +57,7 @@ create database nerdery_challenge;
 ```
 
 5. Close the database connection:
+
 ```
 \q
 ```
@@ -79,83 +80,164 @@ Now it's your turn to write SQL queries to achieve the following results (You ne
 1. Total money of all the accounts group by types.
 
 ```
-Your query here
+SELECT type, SUM(mount)
+FROM accounts
+GROUP BY type;
 ```
-
 
 2. How many users with at least 2 `CURRENT_ACCOUNT`.
 
 ```
-Your query here
+SELECT COUNT(*) AS users_with_multiple_accounts
+FROM (
+    SELECT u.id
+    FROM users u
+    JOIN accounts a ON u.id = a.user_id
+    GROUP BY u.id
+    HAVING COUNT(*) >= 2
+) sub;
 ```
-
 
 3. List the top five accounts with more money.
 
 ```
-Your query here
-```
+SELECT account_id, mount
+FROM accounts
+ORDER BY mount DESC
+LIMIT 5;
 
+```
 
 4. Get the three users with the most money after making movements.
+   > **NOTE**:
+   > For exercises 4 and 7, I implemented a temporary table.
 
 ```
-Your query here
+CREATE TEMP TABLE temp_user_balances AS
+WITH Inflow AS (
+    SELECT a.user_id, SUM(m.mount) AS total_received
+    FROM movements m
+    JOIN accounts a ON m.account_to = a.id
+    GROUP BY a.user_id
+),
+Deposits AS (
+    SELECT a.user_id, SUM(m.mount) AS total_deposits
+    FROM movements m
+    JOIN accounts a ON m.account_from = a.id
+    WHERE m.type IN ('IN')
+    GROUP BY a.user_id
+),
+InitialBalances AS (
+    SELECT user_id, SUM(mount) AS initial_total
+    FROM accounts
+    GROUP BY user_id
+)
+SELECT
+    u.*,
+    (
+        COALESCE(ib.initial_total, 0)
+      + COALESCE(inf.total_received, 0)
+      + COALESCE(dep.total_deposits, 0)
+    ) AS total_balance
+FROM users u
+LEFT JOIN InitialBalances ib ON u.id = ib.user_id
+LEFT JOIN Inflow inf ON u.id = inf.user_id
+LEFT JOIN Deposits dep ON u.id = dep.user_id;
 ```
 
+Then, using that temp table the final query is:
 
-5. In this part you need to create a transaction with the following steps:
+```
+SELECT
+    name || ' ' || last_name AS user_full_name,
+    email,
+    total_balance
+FROM temp_user_balances
+ORDER BY total_balance DESC
+LIMIT 3;
+```
+
+5.  In this part you need to create a transaction with the following steps:
 
     a. First, get the ammount for the account `3b79e403-c788-495a-a8ca-86ad7643afaf` and `fd244313-36e5-4a17-a27c-f8265bc46590` after all their movements.
     b. Add a new movement with the information:
-        from: `3b79e403-c788-495a-a8ca-86ad7643afaf` make a transfer to `fd244313-36e5-4a17-a27c-f8265bc46590`
-        mount: 50.75
+    from: `3b79e403-c788-495a-a8ca-86ad7643afaf` make a transfer to `fd244313-36e5-4a17-a27c-f8265bc46590`
+    mount: 50.75
 
     c. Add a new movement with the information:
-        from: `3b79e403-c788-495a-a8ca-86ad7643afaf` 
-        type: OUT
-        mount: 731823.56
+    from: `3b79e403-c788-495a-a8ca-86ad7643afaf`
+    type: OUT
+    mount: 731823.56
 
         * Note: if the account does not have enough money you need to reject this insert and make a rollback for the entire transaction
-    
+
     d. Put your answer here if the transaction fails(YES/NO):
+
     ```
-        Your answer
+        YES
     ```
 
     e. If the transaction fails, make the correction on step _c_ to avoid the failure:
+
     ```
-        Your query
+        mount <= 5047.66
     ```
 
     f. Once the transaction is correct, make a commit
+
     ```
         Your query
     ```
 
-    e. How much money the account `fd244313-36e5-4a17-a27c-f8265bc46590` have:
+    g. How much money the account `fd244313-36e5-4a17-a27c-f8265bc46590` have:
+
     ```
-        Your query
+        3214
     ```
 
-
-6. All the movements and the user information with the account `3b79e403-c788-495a-a8ca-86ad7643afaf`
+6.  All the movements and the user information with the account `3b79e403-c788-495a-a8ca-86ad7643afaf`
 
 ```
-Your query here
+SELECT
+    u.name || ' ' || u.last_name as account_user,
+    u.email,
+    a.account_id,
+    m.type,
+    m.mount
+FROM users u
+INNER JOIN accounts a ON a.user_id = u.id
+LEFT JOIN movements m ON a.id = m.account_from or a.id = m.account_to
+WHERE a.id = '3b79e403-c788-495a-a8ca-86ad7643afaf';
 ```
-
 
 7. The name and email of the user with the highest money in all his/her accounts
+   > **NOTE:** Using the temporary table created earlier.
 
 ```
-Your query here
+SELECT
+    name || ' ' || last_name as user_full_name,
+    email,
+    total_balance
+FROM temp_user_balances
+ORDER BY total_balance DESC
+LIMIT 1;
 ```
-
 
 8. Show all the movements for the user `Kaden.Gusikowski@gmail.com` order by account type and created_at on the movements table
 
 ```
-Your query here
+SELECT
+    a.type,
+    m.created_at,
+    m.mount
+FROM users u
+JOIN accounts a
+    ON a.user_id = u.id
+JOIN movements m
+    ON m.account_from = a.id
+    OR m.account_to = a.id
+WHERE u.email ILIKE 'Kaden.Gusikowski@gmail.com'
+ORDER BY
+    a.type,
+    m.created_at;
 ```
-
