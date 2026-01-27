@@ -74,17 +74,23 @@ Now it's your turn to write SQL querys to achieve the following results:
 1. Count the total number of states in each country.
 
 ```
-Your query here
+SELECT
+    c.name,
+    count(*) AS states_count
+FROM countries c
+INNER JOIN states s
+ON c.id = s.country_id
+GROUP BY c.name ;
 ```
 
 <p align="center">
  <img src="src/results/result1.png" alt="result_1"/>
 </p>
 
-2. How many employees do not have supervisores.
+2. How many employees do not have supervisors.
 
 ```
-Your query here
+SELECT COUNT(*) employees_without_bosses FROM employees WHERE supervisor_id IS NULL;
 ```
 
 <p align="center">
@@ -94,7 +100,18 @@ Your query here
 3. List the top five offices address with the most amount of employees, order the result by country and display a column with a counter.
 
 ```
-Your query here
+SELECT
+    c.name AS country_name,
+    o.address,
+    COUNT(e.id) AS employee_count
+FROM countries c
+JOIN offices o
+    ON c.id = o.country_id
+JOIN employees e
+    ON o.id = e.office_id
+GROUP BY c.id, o.id
+ORDER BY employee_count DESC
+LIMIT 5;
 ```
 
 <p align="center">
@@ -104,17 +121,48 @@ Your query here
 4. Three supervisors with the most amount of employees they are in charge.
 
 ```
-Your query here
+SELECT e.id supervisor_id, COUNT(*)
+FROM employees e
+INNER JOIN employees m
+ON e.id = m.supervisor_id
+GROUP BY e.id
+ORDER BY count DESC
+LIMIT 3;
 ```
 
 <p align="center">
  <img src="src/results/result4.png" alt="result_4"/>
 </p>
 
+This query is correct but in other case, this maybe could include the supervisor name
+
+```
+SELECT
+    e.id supervisor_id,
+    e.first_name || ' ' || e.last_name AS supervisor_name,
+    COUNT(*)
+FROM employees e
+INNER JOIN employees m
+ON e.id = m.supervisor_id
+GROUP BY e.id
+ORDER BY count DESC
+LIMIT 3;
+```
+
+<p align="center">
+ <img src="src/results/result4_user.png" alt="result_4-user-friendly"/>
+</p>
+
 5. How many offices are in the state of Colorado (United States).
 
 ```
-Your query here
+SELECT count(*) list_of_office
+FROM offices
+WHERE state_id = (
+    SELECT id FROM states
+    WHERE name ILIKE 'COLORADO'
+    LIMIT 1
+);
 ```
 
 <p align="center">
@@ -124,7 +172,11 @@ Your query here
 6. The name of the office with its number of employees ordered in a desc.
 
 ```
-Your query here
+SELECT o.name name, COUNT(*)
+FROM offices o
+LEFT JOIN employees e ON o.id = e.office_id
+GROUP BY o.id
+ORDER BY count DESC;
 ```
 
 <p align="center">
@@ -134,7 +186,21 @@ Your query here
 7. The office with more and less employees.
 
 ```
-Your query here
+(SELECT o.address address, COUNT(*)
+FROM offices o
+INNER JOIN employees e ON o.id = e.office_id
+GROUP BY o.id
+ORDER BY count DESC
+LIMIT 1)
+UNION ALL
+(
+SELECT o.address address, COUNT(*)
+FROM offices o
+INNER JOIN employees e ON o.id = e.office_id
+GROUP BY o.id
+ORDER BY count
+LIMIT 1
+);
 ```
 
 <p align="center">
@@ -144,9 +210,53 @@ Your query here
 8. Show the uuid of the employee, first_name and lastname combined, email, job_title, the name of the office they belong to, the name of the country, the name of the state and the name of the boss (boss_name)
 
 ```
-Your query here
+SELECT
+    e.uuid,
+    e.first_name || ' ' || e.last_name AS full_name,
+    e.email,
+    e.job_title,
+    o.name AS company,
+    c.name AS country,
+    s.name AS state,
+    b.first_name AS boss_name
+FROM employees e
+INNER JOIN employees b
+    ON e.supervisor_id = b.id
+LEFT JOIN offices o
+    ON e.office_id = o.id
+LEFT JOIN states s
+    ON o.state_id = s.id
+LEFT JOIN countries c
+    ON s.country_id = c.id;
 ```
 
 <p align="center">
  <img src="src/results/result8.png" alt="result_8"/>
+</p>
+
+Another option is to use a `LEFT JOIN` instead of an `INNER JOIN` to include the bosses in the result set.
+
+```
+SELECT
+    e.uuid,
+    e.first_name || ' ' || e.last_name AS full_name,
+    e.email,
+    e.job_title,
+    o.name AS company,
+    c.name AS country,
+    s.name AS state,
+    COALESCE(b.first_name, '<NO BOSS>') AS boss_name
+FROM employees e
+LEFT JOIN employees b
+    ON e.supervisor_id = b.id
+LEFT JOIN offices o
+    ON e.office_id = o.id
+LEFT JOIN states s
+    ON o.state_id = s.id
+LEFT JOIN countries c
+    ON s.country_id = c.id;
+```
+
+<p align="center">
+ <img src="src/results/result8_with_bosses.png" alt="result_8 including bosses"/>
 </p>
