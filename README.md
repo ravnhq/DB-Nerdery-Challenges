@@ -74,7 +74,11 @@ Now it's your turn to write SQL querys to achieve the following results:
 1. Count the total number of states in each country.
 
 ```
-Your query here
+SELECT countries.name, COUNT(country_id) 
+FROM countries 
+LEFT JOIN states 
+ON countries.id = states.country_id 
+GROUP BY countries.name;
 ```
 
 <p align="center">
@@ -84,7 +88,9 @@ Your query here
 2. How many employees do not have supervisores.
 
 ```
-Your query here
+SELECT COUNT(id) AS employees_without_bosses 
+FROM employees 
+WHERE supervisor_id IS NULL;
 ```
 
 <p align="center">
@@ -94,7 +100,11 @@ Your query here
 3. List the top five offices address with the most amount of employees, order the result by country and display a column with a counter.
 
 ```
-Your query here
+SELECT countries.name, offices.address, COUNT(office_id)  AS count FROM offices 
+LEFT JOIN employees ON offices.id = employees.office_id 
+LEFT JOIN countries ON offices.country_id = countries.id 
+GROUP BY countries.name,offices.address 
+ORDER BY count DESC LIMIT 5;
 ```
 
 <p align="center">
@@ -104,7 +114,11 @@ Your query here
 4. Three supervisors with the most amount of employees they are in charge.
 
 ```
-Your query here
+SELECT DISTINCT supervisor_id, COUNT(supervisor_id) AS count 
+FROM employees 
+WHERE supervisor_id IS NOT NULL 
+GROUP BY supervisor_id
+ORDER BY count DESC LIMIT 3; 
 ```
 
 <p align="center">
@@ -114,8 +128,26 @@ Your query here
 5. How many offices are in the state of Colorado (United States).
 
 ```
-Your query here
+-- 5
+SELECT COUNT(offices.id) AS list_of_office FROM offices 
+LEFT JOIN states ON offices.state_id = states.id 
+WHERE TRIM(states.name) = 'Colorado';
 ```
+
+```
+-- (Inner join version) - Mentor feedback
+SELECT COUNT(offices.id) AS list_of_office FROM offices
+INNER JOIN states ON offices.state_id = states.id
+WHERE TRIM(states.name) = 'Colorado';
+```
+```
+
+-- (Inner join version but looking out for states id) - Mentor feedback + personal enhancement given that it might not find the exact string is better look it up for id
+SELECT COUNT(offices.id) AS list_of_office FROM offices
+INNER JOIN states ON offices.state_id = states.id
+WHERE states.id = '8';
+```
+
 
 <p align="center">
  <img src="src/results/result5.png" alt="result_5"/>
@@ -124,7 +156,10 @@ Your query here
 6. The name of the office with its number of employees ordered in a desc.
 
 ```
-Your query here
+SELECT offices.name, COUNT(office_id)  AS count FROM offices 
+LEFT JOIN employees ON offices.id = employees.office_id 
+GROUP BY offices.name 
+ORDER BY count DESC;
 ```
 
 <p align="center">
@@ -134,7 +169,38 @@ Your query here
 7. The office with more and less employees.
 
 ```
-Your query here
+WITH GroupedCount AS (
+    SELECT 
+        o.address as Address,
+        COUNT(e.id) AS employee_count
+    FROM offices o
+    LEFT JOIN employees e ON o.id = e.office_id
+    GROUP BY o.address
+    HAVING COUNT(e.id) > 0
+)
+(SELECT Address, employee_count FROM GroupedCount ORDER BY employee_count DESC LIMIT 1)
+UNION ALL
+(SELECT Address, employee_count FROM GroupedCount ORDER BY employee_count ASC LIMIT 1)
+ORDER BY employee_count DESC;
+```
+Version without union all - Mentor feedback
+```
+WITH GroupedCount AS (
+    SELECT 
+        o.address AS office_address,
+        COUNT(e.id) AS employee_count,
+        ROW_NUMBER() OVER (ORDER BY COUNT(e.id) DESC) AS row_desc,
+        ROW_NUMBER() OVER (ORDER BY COUNT(e.id) ASC) AS row_asc
+    FROM offices o
+    INNER JOIN employees e ON o.id = e.office_id
+    GROUP BY o.address
+)
+SELECT 
+    office_address AS address,
+    employee_count AS count
+FROM GroupedCount
+WHERE row_desc = 1 OR row_asc = 1
+ORDER BY employee_count DESC;
 ```
 
 <p align="center">
@@ -144,7 +210,17 @@ Your query here
 8. Show the uuid of the employee, first_name and lastname combined, email, job_title, the name of the office they belong to, the name of the country, the name of the state and the name of the boss (boss_name)
 
 ```
-Your query here
+SELECT e.uuid, CONCAT(e.first_name,' ',e.last_name) as full_name,
+e.email,
+e.job_title, 
+offices.name AS office_name,
+countries.name as country_name, 
+states.name as state_name, 
+es.first_name as supervisor_name FROM employees e 
+LEFT JOIN offices ON e.office_id = offices.id 
+LEFT JOIN employees es ON e.supervisor_id = es.id 
+LEFT JOIN countries ON offices.country_id = countries.id 
+RIGHT JOIN states ON states.country_id = countries.id;     
 ```
 
 <p align="center">
